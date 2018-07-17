@@ -6,10 +6,18 @@
 </head>
 <body>
 
-    <div id="main" v-if ="images.length > 0">
-        <div id="sub-main" v-for =" image in images">
-            <img :src="image.url" alt="">
+    <div id="main">
+        <input type="text" name="title" v-model="title" placeholder="Title">
+        <input type="text" name="description" v-model="description" placeholder="Description">
+        <input type="text" name="username" v-model="username" placeholder="Username">
+        <label for="file-field">Select image</label>
+        <input type="file" id="file-field" @change="imageSelected">
+        <button @click="upload">Upload</button>
 
+        <h1>Latest images</h1>
+
+        <div v-for="image in images">
+            <img :src="image.url" :alt="image.title">
             <h2>{{ image.title }}</h2>
         </div>
      </div>

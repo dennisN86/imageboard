@@ -2,3 +2,12 @@ img {
     width: 150px;
     height: 150px;
 }
+
+#file-field {
+    transform: translateX(-3000px);
+}
+
+label {
+    border: 1px tomato solid;
+    border-radius: 5px;
+}

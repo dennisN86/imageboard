@@ -30,13 +30,19 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + "/public"));
 
+// check for imageId
+// "/comment/:imageId"
+app.get("/images/:id", (req, res) => {
+    // new get request here
+});
+
 app.get("/images", (req, res) => {
     db.getImages().then(results => {
         res.json(results);
     });
 });
 
-app.post("/upload", s3.upload, uploader.single("file"), function(req, res) {
+app.post("/upload", uploader.single("file"), s3.upload, function(req, res) {
     console.log(req.file);
     db.addImage(
         config.s3Url + req.file.filename,
@@ -53,3 +59,9 @@ app.post("/upload", s3.upload, uploader.single("file"), function(req, res) {
 });
 
 app.listen(8080, () => console.log(`I'm listening`));
+
+// create form field for username, comments
+// create post route to write comments into table
+// create get route to get the comments
+
+// <image model needs x-if-....

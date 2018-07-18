@@ -1,11 +1,31 @@
 (function() {
+    Vue.component("image-modal", {
+        data: function() {
+            return {
+                title: ""
+            };
+        },
+        props: ["id"],
+        mounted: function() {
+            var self = this;
+
+            axios.get("/get-single-image" + this.id).then(resp => {
+                self.url = resp.data.url;
+                self.title = resp.data.title;
+            });
+        },
+        template: "#id-image"
+    });
+    // capture the image id the user clicked on
+
     var app = new Vue({
         el: "#main",
         data: {
             images: [],
             title: "",
             description: "",
-            username: ""
+            username: "",
+            id: null
         },
         mounted: function() {
             var self = this;
@@ -17,6 +37,9 @@
             imageSelected: function(e) {
                 this.imageFile = e.target.files[0];
                 console.log(e.target.files[0]);
+            },
+            getModal: function(id) {
+                this.id = id;
             },
             upload: function() {
                 console.log("This file uploading", this.imageFile);

@@ -28,11 +28,11 @@ exports.upload = function(req, res, next) {
     const readStream = fs.createReadStream(req.file.path);
     readStream.pipe(s3Request);
     s3Request.on("response", s3Response => {
-        if (!s3Response.statusCode == 200) {
+        if (s3Response.statusCode == 200) {
             next();
             fs.unlink(req.file.path, () => {});
         } else {
-            res.json({
+            return res.json({
                 error: true
             });
         }

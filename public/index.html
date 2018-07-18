@@ -17,10 +17,20 @@
         <h1>Latest images</h1>
 
         <div v-for="image in images">
-            <img :src="image.url" :alt="image.title">
+            <img :src="image.url" :alt="image.title" @click="getModal(image.id)">
             <h2>{{ image.title }}</h2>
         </div>
+
+        <image-modal v-if="id" :id="id"></image-modal>
      </div>
+
+     <script id="id-image" type="text/x-template">
+         <!-- <img :src="url"> -->
+         <div>
+            <h1>Comments</h1>
+            <h1>Username</h1>
+         </div>
+     </script>
 
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>

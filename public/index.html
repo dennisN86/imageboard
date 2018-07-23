@@ -1,39 +1,93 @@
 <!doctype html>
 <html>
 <head>
-    <title>My Awesome Image Board</title>
+    <title>Imageboard</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheet.css">
 </head>
 <body>
 
+    <!-- ############################################################################################# -->
+
+    <h1>Imageboard</h1>
+
     <div id="main">
-        <input type="text" name="title" v-model="title" placeholder="Title">
-        <input type="text" name="description" v-model="description" placeholder="Description">
-        <input type="text" name="username" v-model="username" placeholder="Username">
-        <label for="file-field">Select image</label>
-        <input type="file" id="file-field" @change="imageSelected">
-        <button @click="upload">Upload</button>
+
+        <h2>Upload an image:</h2>
+
+        <div id="image-form">
+
+            <input id="title" type="text" v-model="imageToUpload.title" placeholder="title">
+            <input id="description" type="text" v-model="imageToUpload.description" placeholder="description">
+            <input id="username" type="text" v-model="imageToUpload.username" placeholder="username">
+            <label for="file">
+                <img id="select-img" src="/select.svg"/>
+            </label>
+            <label type="submit" @click="uploadImage">
+                <img id="upload-img" src="/upload.svg"/>
+            </label>
+            <input id="file" type="file" @change="getSelected">
+        </div>
+
+        <!-- ############################################################################################# -->
 
         <h1>Latest images</h1>
 
-        <div v-for="image in images">
-            <img :src="image.url" :alt="image.title" @click="getModal(image.id)">
-            <h2>{{ image.title }}</h2>
+        <div id="images" v-if="images.length > 0">
+            <div v-for="image in images">
+                <div class="casing" @click="changeId(image.id)">
+                    <h2 class="description">{{ image.title }}</h2>
+                    <img class="image" :key="image.id" :src="image.url" :alt="image.title">
+                </div>
+            </div>
         </div>
 
-        <image-modal v-if="id" :id="id"></image-modal>
-     </div>
+        <image-modal v-if="imageId" :id_modal="imageId" @unmodalify="changeId"><image-modal>
 
-     <script id="id-image" type="text/x-template">
-         <!-- <img :src="url"> -->
-         <div>
-            <h1>Comments</h1>
-            <h1>Username</h1>
-         </div>
-     </script>
+   </div>
 
+    <!-- ############################################################################################# -->
+
+    <script id="modal-template" type="text/x-template">
+        <div id="modal-overlay" @click="emitUnmodalify(null)">
+
+            <div class="modal-casing" v-on:click.stop="">
+
+                <img class="modal-image" :src="imageToModal.url"><br>
+                <label id="delete" type="submit" @click="deleteImage">
+                    <img id="trash" src="/trash.svg">
+                </label>
+                <p class="modal-title">{{imageToModal.title}}</p>
+                <p class="modal-description">{{imageToModal.description}}</p>
+                <p class="modal-info">Uploaded by {{imageToModal.username}} on {{imageToModal.created_at}}</p>
+
+                <div id="form-comment">
+                    <label for="comment-text">Comment:</label>
+                    <input id="comment-text" type="text" v-model="commentToUpload.comment" placeholder="Please comment here" required>
+                    <label for="comment-user">Username:</label>
+                    <input id="comment-user" type="text" v-model="commentToUpload.username" placeholder="Type in your username" required>
+                    <label type="submit" @click="addComment">
+                        <img id="pen" src="/pen.svg">
+                    </label>
+                </div>
+
+                <div id="modal-comments" v-if="comments.length > 0">
+                    <div v-for="comment in comments">
+                        <div class="comments-casing">
+                            <p class="comment-text">{{ comment.comment }}</p><br>
+                            <p class="comment-info">by {{ comment.username }} on {{ comment.created_at }}</p>
+                            <button @click="deleteComment(comment.id)">Delete comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
-    <script src="/js/script.js"></script>
+    <script src='/js/script.js'></script>
 </body>
 </html>

@@ -8,6 +8,10 @@ const path = require("path");
 const s3 = require("./s3");
 const config = require("./config");
 
+///////////////////////////////////////////
+////////////// middleware /////////////////
+///////////////////////////////////////////
+
 const diskStorage = multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, __dirname + "/uploads");
@@ -18,7 +22,7 @@ const diskStorage = multer.diskStorage({
         });
     }
 });
-// multer looks for name equals file
+
 const uploader = multer({
     storage: diskStorage,
     limits: {
@@ -26,42 +30,82 @@ const uploader = multer({
     }
 });
 
+const handleFile = uploader.single("file");
+
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname + "/public"));
 
-// check for imageId
-// "/comment/:imageId"
-app.get("/images/:id", (req, res) => {
-    // new get request here
-});
+///////////////////////////////////////////
+////////////// routes /////////////////////
+///////////////////////////////////////////
 
-app.get("/images", (req, res) => {
-    db.getImages().then(results => {
-        res.json(results);
-    });
-});
+app.get("/images", (req, res) =>
+    db
+        .getImages(0)
+        .then(images => res.json(images))
+        .catch(err => console.log(err))
+);
 
-app.post("/upload", uploader.single("file"), s3.upload, function(req, res) {
-    console.log(req.file);
-    db.addImage(
-        config.s3Url + req.file.filename,
-        req.body.username,
-        req.body.title,
-        req.body.description
-    ).then(image => {
-        console.log("image:", image);
-        res.json({
-            success: true,
-            image: image
-        });
-    });
-});
+app.get("/image/:imageId", (req, res) =>
+    db
+        .getImage(req.params.imageId)
+        .then(image => res.json(image))
+        .catch(err => console.log(err))
+);
+
+app.post("/uploadImage", handleFile, s3.upload, (req, res) =>
+    db
+        .insertImage(
+            config.s3Url + req.file.filename,
+            req.body.username,
+            req.body.title,
+            req.body.description
+        )
+        .then(image =>
+            res.json({
+                success: true,
+                image: image
+            })
+        )
+        .catch(err => console.log(err))
+);
+
+app.post("/deleteImage/:imageId", (req, res) =>
+    db
+        .deleteImage(req.params.imageId)
+        .then(message => res.json(message))
+        .catch(err => console.log(err))
+);
+
+app.get("/comments/:imageId", (req, res) =>
+    db
+        .getComments(req.params.imageId)
+        .then(comments => res.json(comments))
+        .catch(err => console.log(err))
+);
+
+app.post("/addComment/:imageId", (req, res) =>
+    db
+        .insertComment(req.params.imageId, req.body.username, req.body.comment)
+        .then(comment => res.json(comment))
+        .catch(err => console.log(err))
+);
+
+app.post("/deleteComment/:imageId/:commentId", (req, res) =>
+    db
+        .deleteComment(req.params.commentId)
+        .then(
+            db
+                .getComments(req.params.imageId)
+                .then(comments => res.json(comments))
+                .catch(err => console.log(err))
+        )
+        .catch(err => console.log(err))
+);
+
+///////////////////////////////////////////
+////////////// listening //////////////////
+///////////////////////////////////////////
 
 app.listen(8080, () => console.log(`I'm listening`));
-
-// create form field for username, comments
-// create post route to write comments into table
-// create get route to get the comments
-
-// <image model needs x-if-....

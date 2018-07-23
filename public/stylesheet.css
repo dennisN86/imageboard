@@ -1,13 +1,175 @@
-img {
-    width: 150px;
-    height: 150px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    outline: 0;
+    font-family: Helvetica;
+    color: white;
+    overflow-x: hidden;
 }
 
-#file-field {
+body {
+    background-image: url("background.jpg");
+    background-size: cover;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+#image-form {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 10%;
+}
+
+h1 {
+    text-align: center;
+    vertical-align: center;
+    padding: 10px;
+}
+
+h2 {
+    font-size: 25px;
+    margin: 15px;
+}
+
+p {
+    font-size: 25px;
+    padding: 15px;
+}
+
+#select-img {
+    padding-left: 15px;
+    height: 50px;
+    width: 80px;
+    margin-top: 15px;
+}
+
+#upload-img {
+    padding-left: 15px;
+    height: 80px;
+    width: 80px;
+}
+
+input {
+    height: 70px;
+    width: 250px;
+    background-color: white;
+    padding-left: 10px;
+    margin-left: 10px;
+    margin-right: 57px;
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+}
+
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image {
+    height: 250px;
+    width: 250px;
+}
+
+.modal-casing {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: white;
+    padding: 25px;
+    width: auto;
+    height: 70vh;
+}
+
+.modal-image {
+    height: 70vh;
+    object-fit: contain;
+}
+
+.modal-title {
+    height: auto;
+    text-align: center;
+    color: black;
+}
+
+.modal-description {
+    height: auto;
+    text-align: center;
+    color: black;
+}
+
+.modal-info {
+    height: auto;
+    text-align: left;
+}
+
+#trash {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+    margin-right: 75px;
+}
+
+#pen {
+    margin-top: 20px;
+    margin-left: 15px;
+    width: 38px;
+    height: 30px;
+}
+
+#images {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 10px;
+}
+
+.casing {
+    display: grid;
+    grid-auto-rows: 1fr auto;
+    margin-left: 25px;
+}
+
+#image {
+    height: 250px;
+    width: 250px;
+}
+
+.description {
+    height: auto;
+    text-align: left;
+}
+
+#file {
     transform: translateX(-3000px);
 }
 
-label {
-    border: 1px tomato solid;
+#modal-comments {
+    width: 100%;
+}
+
+.comments-casing {
+    width: auto;
+    border: 2px white solid;
     border-radius: 5px;
+    background-color: white;
+    background-color: rgb(158, 189, 239);
+    padding: 5px 10px;
+    margin-left: 48px;
+}
+
+#message {
+    border: 2px white solid;
+    border-radius: 5px;
+    /* background-color: #553928; */
+    background-color: darkgrey;
+    padding: 5px 10px;
+    margin: 5px 10px;
 }

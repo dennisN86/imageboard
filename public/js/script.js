@@ -2,55 +2,144 @@
     Vue.component("image-modal", {
         data: function() {
             return {
-                title: ""
+                imageToModal: {},
+                comments: [],
+                commentToUpload: {
+                    comment: "",
+                    username: ""
+                }
             };
         },
-        props: ["id"],
+        props: ["id_modal"],
+        template: "#modal-template",
         mounted: function() {
             var self = this;
-
-            axios.get("/get-single-image" + this.id).then(resp => {
-                self.url = resp.data.url;
-                self.title = resp.data.title;
-            });
+            axios
+                .get(`/image/${self.id_modal}`)
+                .then(function(response) {
+                    self.imageToModal = response.data;
+                    axios
+                        .get(`/comments/${self.id_modal}`)
+                        .then(function(response) {
+                            self.comments = response.data;
+                        })
+                        .catch(function(err) {
+                            console.log(
+                                'Error axios.get("/comments"): \n',
+                                err
+                            );
+                        });
+                })
+                .catch(function(err) {
+                    console.log('Error axios.get("/image/:imageId"): \n', err);
+                });
         },
-        template: "#id-image"
+        methods: {
+            emitUnmodalify: function(imageId) {
+                this.$emit("unmodalify", imageId);
+            },
+            addComment: function() {
+                var self = this;
+                axios
+                    .post(`/addComment/${self.id_modal}`, self.commentToUpload)
+                    .then(function(response) {
+                        self.comments.unshift(response.data);
+                        self.commentToUpload = {};
+                    })
+                    .catch(function(err) {
+                        console.log(
+                            'Error axios.post("/addComment/:imageId"): \n',
+                            err
+                        );
+                    });
+            },
+            deleteImage: function() {
+                var self = this;
+                axios
+                    .post(`/deleteImage/${self.id_modal}`)
+                    .then(function() {})
+                    .catch(function(err) {
+                        console.log(
+                            'Error axios.post("/deleteImage/:imageId"): \n',
+                            err
+                        );
+                    });
+                this.$emit("unmodalify", null);
+            },
+            deleteComment: function(commentId) {
+                var self = this;
+                axios
+                    .post(`/deleteComment/${self.id_modal}/${commentId}`)
+                    .then(function(response) {
+                        self.comments = response.data;
+                    })
+                    .catch(function(err) {
+                        console.log(
+                            'Error axios.post("/deleteComment/:imageId/commentId"): \n',
+                            err
+                        );
+                    });
+            }
+        }
     });
-    // capture the image id the user clicked on
+
+    ///////////////////////////////////////////
+    ////////////// main vue ///////////////////
+    ///////////////////////////////////////////
 
     var app = new Vue({
         el: "#main",
         data: {
+            imageId: null,
             images: [],
-            title: "",
-            description: "",
-            username: "",
-            id: null
+            imageFile: "",
+            imageToUpload: {
+                title: "",
+                description: "",
+                username: ""
+            }
         },
         mounted: function() {
-            var self = this;
-            axios.get("/images").then(function(results) {
-                self.images = results.data;
-            });
+            axios
+                .get("/images")
+                .then(function(response) {
+                    app.images = response.data;
+                })
+                .catch(function(err) {
+                    console.log('Error axios.get("/images"): \n', err);
+                });
         },
         methods: {
-            imageSelected: function(e) {
+            changeId: function(imageId) {
+                app.imageId = imageId;
+            },
+            getSelected: function(e) {
                 this.imageFile = e.target.files[0];
-                console.log(e.target.files[0]);
+                e.target.value = "";
             },
-            getModal: function(id) {
-                this.id = id;
-            },
-            upload: function() {
-                console.log("This file uploading", this.imageFile);
+            uploadImage: function() {
                 var formData = new FormData();
-                formData.append("file", this.imageFile);
-                formData.append("title", this.title);
-                formData.append("description", this.description);
-                formData.append("username", this.username);
-                axios.post("/upload", formData).then(function(res) {
-                    app.images.unshift(res.data.image);
-                });
+                formData.append("file", app.imageFile);
+                formData.append("username", app.imageToUpload.username);
+                formData.append("title", app.imageToUpload.title);
+                formData.append("description", app.imageToUpload.description);
+                axios
+                    .post("/uploadImage", formData)
+                    .then(function(response) {
+                        if (response.data.error)
+                            throw new Error(
+                                'Error axios.post("/uploadImage"): \n'
+                            );
+                        app.images.unshift(response.data.image);
+                        app.imageFile = "";
+                        app.imageToUpload = {};
+                    })
+                    .catch(function(err) {
+                        console.log(
+                            'Error axios.post("/uploadImage"): \n',
+                            err
+                        );
+                    });
             }
         }
     });
